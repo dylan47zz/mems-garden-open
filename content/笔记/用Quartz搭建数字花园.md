@@ -254,6 +254,29 @@ GitHub 有一个安全限制：**由 Actions bot 发起的跨仓库 push，不�
 
 加在 sync action 的最后一步，用 PAT 直接调用 API，绕过跨仓库 push 的触发限制。`workflow_dispatch` 不受这个安全限制影响。
 
+### 坑 6：`public-garden` 目录每次 sync 都嵌套一层
+
+`find "$SOURCE"` 从 `$GITHUB_WORKSPACE` 开始扫描，而 `actions/checkout` 把公开仓库 checkout 到了 `$GITHUB_WORKSPACE/public-garden/`。这导致每次 sync 都会把 `public-garden/content/` 里的文件也复制进去，生成 `content/public-garden/content/public-garden/...` 的无限套娃。
+
+跑了几次后，仓库里出现了整整 5 层嵌套：
+
+```
+content/
+  public-garden/
+    content/
+      public-garden/
+        content/
+          public-garden/  ← 还在继续...
+```
+
+**解法：** `find` 命令里加一行排除条件：
+
+```bash
+-not -path "$SOURCE/public-garden/*" \
+```
+
+已有的嵌套目录需要手动用 `git rm -r content/public-garden/` 清理一次。
+
 ---
 
 ```bash

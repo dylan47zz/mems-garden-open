@@ -1,10 +1,12 @@
 ---
-title: Dylan's Garden
+title: "Dylan's Garden"
 publish: true
 ---
 
-# Welcome to Dylan's Garden 🌱
+# Dylan's Garden 🌱
 
-这里是我的数字花园，记录我的学习与思考。
+这里是我的数字花园，记录学习与思考。
 
-> 仅展示标记了 `publish: true` 的笔记。
+## 笔记列表
+
+

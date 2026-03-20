@@ -9,7 +9,3 @@ tsconfig.tsbuildinfo
 private/
 .replit
 replit.nix
-# Content is synced from mems-garden via scripts/sync-garden.sh
-# Only index.md is tracked in git
-content/*
-!content/index.md

@@ -236,9 +236,25 @@ Workflow 的 `paths` 设置为只监听 `.md` 文件变更，但修复 workflow 
 
 **解法：** paths 里加上 `.github/workflows/publish.yml`，同时加 `workflow_dispatch` 支持手动触发。
 
----
+### 坑 5：sync push 不会自动触发公开仓库的 deploy
 
-## 日常使用
+GitHub 有一个安全限制：**由 Actions bot 发起的跨仓库 push，不会触发目标仓库的 workflow**。这导致 sync 成功把笔记推到 `mems-garden-open`，但 deploy workflow 纹丝不动，每次还是要手动点 "Run workflow"。
+
+**解法：** 在 sync 结束后，直接调用 GitHub API 触发 `workflow_dispatch` 事件：
+
+```yaml
+- name: Trigger deploy workflow in public garden
+  run: |
+    curl -X POST \
+      -H "Authorization: Bearer ${{ secrets.GARDEN_PUBLISH_TOKEN }}" \
+      -H "Accept: application/vnd.github+json" \
+      https://api.github.com/repos/dylan47zz/mems-garden-open/actions/workflows/deploy.yml/dispatches \
+      -d '{"ref":"v4"}'
+```
+
+加在 sync action 的最后一步，用 PAT 直接调用 API，绕过跨仓库 push 的触发限制。`workflow_dispatch` 不受这个安全限制影响。
+
+---
 
 ```bash
 # 写完笔记，加上 publish: true
